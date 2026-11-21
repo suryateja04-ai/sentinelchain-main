@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Federated Hospital Units</title>
+<style>
+@page { size: A4; margin: 16mm 15mm 17mm 15mm; }
+:root { --ink:#16212b; --muted:#4f5d69; --line:#c9d2da; --soft:#f2f5f7; --acc:#0b6e63; --accs:#e2f0ee; --warn:#8a5a00; --warns:#fbf3e2; --blue:#24527a; --blues:#e7eef6; --pur:#5b3a86; --purs:#efe9f7; }
+* { box-sizing:border-box; }
+body { font-family:"Liberation Sans","DejaVu Sans",Arial,sans-serif; color:var(--ink); font-size:10.4pt; line-height:1.45; margin:0; }
+h1 { font-size:22pt; margin:0 0 4pt; line-height:1.15; }
+h2 { font-size:14pt; margin:14pt 0 6pt; border-bottom:1.5pt solid var(--acc); padding-bottom:3pt; break-after:avoid; }
+h2 .no { color:var(--acc); margin-right:6pt; }
+h3 { font-size:11pt; margin:9pt 0 4pt; break-after:avoid; }
+p { margin:0 0 6pt; } ul,ol { margin:0 0 6pt; padding-left:16pt; } li { margin-bottom:2pt; }
+.brk { break-before:page; }
+.eyebrow { font-size:8.5pt; letter-spacing:.12em; text-transform:uppercase; color:var(--acc); font-weight:bold; }
+.cover { border:1.2pt solid var(--line); border-radius:6pt; padding:16pt 18pt; margin-bottom:10pt; }
+.sub { color:var(--muted); font-size:11pt; margin-bottom:8pt; }
+table { border-collapse:collapse; width:100%; margin:3pt 0 9pt; font-size:9.2pt; break-inside:avoid; }
+th,td { border:.6pt solid var(--line); padding:3pt 5pt; text-align:left; vertical-align:top; }
+th { background:var(--soft); font-size:8.6pt; }
+.box { border-radius:0 5pt 5pt 0; padding:6pt 10pt; margin:6pt 0 9pt; break-inside:avoid; }
+.key { background:var(--accs); border-left:3.5pt solid var(--acc); }
+.note { background:var(--warns); border-left:3.5pt solid var(--warn); }
+.box b.lbl { display:block; font-size:7.8pt; letter-spacing:.1em; text-transform:uppercase; margin-bottom:2pt; }
+.key b.lbl { color:var(--acc); } .note b.lbl { color:var(--warn); }
+.f { font-family:"DejaVu Sans Mono",monospace; font-size:8.8pt; background:var(--soft); border:.6pt solid var(--line); border-radius:3pt; padding:5pt 8pt; margin:3pt 0 7pt; white-space:pre; break-inside:avoid; }
+code { font-family:"DejaVu Sans Mono",monospace; font-size:8.7pt; background:var(--soft); padding:0 2pt; border-radius:2pt; }
+.cap { text-align:center; font-size:8.6pt; color:var(--muted); margin:3pt 0 9pt; }
+/* architecture diagram */
+.arch { display:grid; grid-template-columns: 1.05fr 18pt 1.5fr 18pt 1.05fr; align-items:center; border:.8pt solid var(--line); border-radius:6pt; padding:10pt; break-inside:avoid; margin-top:4pt; }
+.col { display:flex; flex-direction:column; gap:5pt; }
+.hosp { border:1pt solid var(--blue); background:var(--blues); border-radius:4pt; padding:4pt 6pt; font-size:8.3pt; line-height:1.25; }
+.hosp b { display:block; font-size:9pt; color:var(--blue); }
+.server { border:1.2pt dashed var(--acc); border-radius:6pt; padding:6pt; }
+.server .t { text-align:center; font-weight:bold; font-size:9pt; letter-spacing:.08em; color:var(--acc); margin-bottom:4pt; }
+.stage { border:1pt solid var(--acc); background:#fff; border-radius:4pt; padding:4pt 6pt; font-size:8.3pt; text-align:center; line-height:1.25; }
+.stage b { display:block; font-size:9pt; }
+.stage.g { background:var(--accs); }
+.down { text-align:center; color:var(--acc); font-size:10pt; line-height:1; margin:2pt 0; }
+.arrow { text-align:center; color:var(--acc); font-size:12pt; }
+.out { border:1pt solid var(--pur); background:var(--purs); border-radius:4pt; padding:4pt 6pt; font-size:8.3pt; line-height:1.25; }
+.out b { display:block; font-size:9pt; color:var(--pur); }
+.loop { grid-column: 1 / span 5; margin-top:7pt; border-top:1pt dashed var(--acc); padding-top:4pt; text-align:center; font-size:8.5pt; color:var(--acc); }
+.steps { counter-reset:s; margin:4pt 0 8pt; }
+.step { display:grid; grid-template-columns:22pt 1fr; gap:0 7pt; margin-bottom:5pt; break-inside:avoid; }
+.step::before { counter-increment:s; content:counter(s); width:20pt; height:20pt; border-radius:50%; border:1.2pt solid var(--acc); color:var(--acc); font-weight:bold; font-size:9pt; display:flex; align-items:center; justify-content:center; }
+.step b { font-size:10pt; } .step span { display:block; color:var(--muted); font-size:9.5pt; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:10pt; }
+.wire { border:.8pt solid var(--line); border-radius:5pt; padding:6pt 8pt; font-size:8.8pt; break-inside:avoid; }
+.wire h4 { margin:0 0 4pt; font-size:9.5pt; color:var(--acc); }
+.tick { color:var(--acc); font-weight:bold; } .todo { color:var(--warn); font-weight:bold; }
+.flow3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8pt; margin:4pt 0 8pt; break-inside:avoid; }
+.ag3 { border:1pt solid var(--acc); border-radius:5pt; padding:5pt 7pt; font-size:8.6pt; }
+.ag3 .n { font-size:7.5pt; font-weight:bold; letter-spacing:.08em; color:var(--acc); }
+.ag3 b { display:block; font-size:9.6pt; margin:1pt 0 3pt; }
+.ag3 ul { margin:0; padding-left:11pt; } .ag3 li { margin-bottom:1.5pt; }
+</style></head><body>
+
+<div class="cover">
+  <div class="eyebrow">Phase-II Design Report &middot; Batch E6 &middot; Department of CSE, GRIET</div>
+  <h1>Federated Hospital Units</h1>
+  <div class="sub">Extending "AI-Agent Based Early Prediction and Clinical Guidance Support for Sepsis" with privacy-preserving federated learning</div>
+  <p style="margin:0">B. Sainath (23241A05T1) &middot; C. Surya Teja (23241A05T7) &middot; M. Shiva Ganesh (23241A05W5) &middot; P. Sahith (23241A05W9)<br>
+  <b>Guide:</b> Dr. Krishna Chythanya N, Professor</p>
+</div>
+
+<h2><span class="no">1</span>Purpose</h2>
+<p>In Phase-I all training data was pooled in one place. Real hospitals cannot do that: patient records are protected and usually cannot leave the hospital. This report describes how the system is turned into a <b>federated</b> system in which <b>every hospital has its own unit</b>. Each unit keeps its patient data inside the hospital, trains on it, and runs predictions according to its own data. Hospitals improve a shared model by exchanging only model updates through a central server, which checks every update before using it.</p>
+<div class="box key"><b class="lbl">In one sentence</b>
+The data stays in each hospital; only signed and validated model updates travel to the central server, which combines them into a global model and sends it back to every hospital for the next round.</div>
+
+<h2><span class="no">2</span>Reference process</h2>
+<p>The federated unit follows the standard agentic federated learning process shown in the reference poster (Agentic Federated Learning for Privacy-Preserving Disease Prediction). Only the <b>process</b> is taken from it; the dataset, models and clinical pipeline remain those of this project.</p>
+<table>
+<tr><th style="width:30%">Reference process step</th><th>How it is realised in this project</th></tr>
+<tr><td>Hospitals A to E, local training</td><td>Hospital units built from PhysioNet set A and set B (two real hospital systems), optionally split by ICU type into more clients</td></tr>
+<tr><td>Model updates sent to the server</td><td>Weights of the neural models after local training, signed by the hospital</td></tr>
+<tr><td>Security Layer</td><td>HMAC-SHA256 signature check with a secret key per hospital</td></tr>
+<tr><td>Orchestrator Agent (validates and filters)</td><td>Rejects non-finite, implausible, oversized or opposite-direction updates, with a logged reason</td></tr>
+<tr><td>Federated Aggregation (FedAvg / FedProx)</td><td>Weighted average of accepted updates; FedProx variant for non-IID hospitals</td></tr>
+<tr><td>Global Model</td><td>New global weights with a version and SHA-256 digest</td></tr>
+<tr><td>Universal updates, repeated rounds</td><td>Global model sent back to every hospital each round</td></tr>
+<tr><td>Prediction, explanation, clinician</td><td>The three-agent pipeline (Section 9), run inside each hospital unit</td></tr>
+<tr><td>Hospital console and administrator screens</td><td>Hospital Unit page per hospital and a Central Server page in the portal</td></tr>
+<tr><td>FedAvg vs FedProx comparison, per-client results</td><td>Same comparisons, plus local-only and centralised references</td></tr>
+</table>
+
+<h2><span class="no">3</span>System architecture</h2>
+<div class="arch">
+  <div class="col">
+    <div class="hosp"><b>Hospital A unit</b>PhysioNet set A, 20,336 patients<br>local preprocessing + training</div>
+    <div class="hosp"><b>Hospital B unit</b>PhysioNet set B, 20,000 patients<br>local preprocessing + training</div>
+    <div class="hosp"><b>More hospital units</b>optional: one client per ICU type (MICU, SICU, unknown)</div>
+    <div class="hosp" style="background:#fff;border-style:dashed"><b>Raw data</b>never leaves the unit</div>
+  </div>
+  <div class="arrow">➜</div>
+  <div class="server">
+    <div class="t">CENTRAL SERVER</div>
+    <div class="stage"><b>Security Layer</b>verify HMAC-SHA256 signature</div>
+    <div class="down">&#9660;</div>
+    <div class="stage"><b>Orchestrator Agent</b>validate and filter updates, log reasons</div>
+    <div class="down">&#9660;</div>
+    <div class="stage"><b>Federated Aggregation</b>FedAvg or FedProx, weighted by windows</div>
+    <div class="down">&#9660;</div>
+    <div class="stage g"><b>Global Model</b>versioned, SHA-256 digest</div>
+  </div>
+  <div class="arrow">➜</div>
+  <div class="col">
+    <div class="out"><b>Personalisation</b>each hospital calibrates, weights and sets its own threshold on its own validation patients</div>
+    <div class="out"><b>Three agents</b>1 data gathering and preprocessing &middot; 2 sepsis prediction &middot; 3 explainability and clinical guidance</div>
+    <div class="out"><b>Clinician</b>sees risk, reasons, flags and alerts</div>
+  </div>
+  <div class="loop">Hospitals send signed updates to the server &nbsp;&middot;&nbsp; &#8635; universal update: the global model goes back to every hospital unit, and the round repeats</div>
+</div>
+<p class="cap">Fig 1. Federated hospital units with the central server pipeline</p>
+
+<h3>Hospital clients</h3>
+<p>PhysioNet 2019 already comes from two hospital systems, so the split into hospitals is real rather than artificial:</p>
+<table>
+<tr><th>Client</th><th>Source</th><th>Patients</th><th>Why it is a fair client</th></tr>
+<tr><td>Hospital A</td><td>PhysioNet training set A</td><td>20,336</td><td>Separate hospital system with its own patients and recording practice</td></tr>
+<tr><td>Hospital B</td><td>PhysioNet training set B</td><td>20,000</td><td>Separate hospital system; patient IDs start at 100001</td></tr>
+<tr><td>A-MICU, A-SICU, B-MICU, &hellip;</td><td>Same sets split by the Unit1 / Unit2 flags (option)</td><td>Counted at run time</td><td>Medical and surgical ICUs differ in case mix, which makes the clients non-IID</td></tr>
+</table>
+<p>Inside each client the patients are split exactly as in Phase-I (80/20, then 80/20, seed 42), so every hospital has its own training, validation and test patients.</p>
+
+<h2><span class="no">4</span>One federated round</h2>
+<div class="steps">
+  <div class="step"><div><b>Universal update</b><span>The server sends the current global model to every hospital unit. Every hospital starts round 1 from the same initial weights.</span></div></div>
+  <div class="step"><div><b>Local training</b><span>Each unit trains on its own training windows for one local epoch (Adam, learning rate 0.001, batch 256, positive-class weight from the federation's counts). With FedProx a proximal term keeps the local model close to the global one.</span></div></div>
+  <div class="step"><div><b>Signing</b><span>The unit signs its update and sample count with HMAC-SHA256 using the secret key it received at registration.</span></div></div>
+  <div class="step"><div><b>Security Layer</b><span>The server recomputes the signature. An update from an unknown client, or one changed in transit, is dropped.</span></div></div>
+  <div class="step"><div><b>Orchestrator Agent</b><span>Validates every verified update (Section 6) and filters out faulty or malicious ones. Each decision is logged with its reason.</span></div></div>
+  <div class="step"><div><b>Federated Aggregation</b><span>Accepted updates are averaged, weighted by each hospital's number of training windows. If every update is rejected, the global model is kept unchanged.</span></div></div>
+  <div class="step"><div><b>Global model and evaluation</b><span>The new global model gets a SHA-256 digest. Each hospital reports its validation AUROC, F1 and accuracy, and the server keeps the best round by window-weighted validation AUROC.</span></div></div>
+</div>
+<p>After the last round, every hospital <b>personalises</b> the global models on its own validation patients (Section 8) and deploys them inside its unit.</p>
+
+<h2><span class="no">5</span>What is shared and what is not</h2>
+<table>
+<tr><th>Leaves the hospital</th><th>Never leaves the hospital</th></tr>
+<tr><td>
+<ul style="margin:0"><li>Neural model weights after each round (signed)</li>
+<li>Trained gradient-boosted tree models</li>
+<li>Number of training windows and positive windows</li>
+<li>Aggregate statistics for preprocessing: per-variable minimum and maximum, a weighted histogram, sums and sums of squares</li></ul></td>
+<td><ul style="margin:0"><li>Patient rows and hourly values</li><li>Patient identifiers</li><li>The label of any single patient</li><li>Validation and test predictions</li></ul></td></tr>
+</table>
+
+<h3>Federated preprocessing</h3>
+<p>Phase-I fitted the median imputer and standard scaler on pooled training data. In the federated unit they are fitted without moving rows, in two rounds:</p>
+<ol><li>Each hospital sends the minimum and maximum of every variable; the server merges them into a global range.</li>
+<li>Each hospital sends, per variable, a 4,096-bin histogram over that range, the number of observed values, and their sum and sum of squares. Each hour is counted once for every training window it appears in, as in Phase-I.</li></ol>
+<p>The server reads the global median from the merged histogram (accurate to one bin width). Because missing values are replaced by that median, the global mean and standard deviation can then be computed exactly from the sums.</p>
+
+<h3>Models in the federation</h3>
+<table>
+<tr><th>Model</th><th>How it is federated</th></tr>
+<tr><td>GRU, LSTM, Temporal CNN, Logistic Regression</td><td>Federated averaging of weights over rounds (FedAvg or FedProx)</td></tr>
+<tr><td>LightGBM, XGBoost</td><td>Trees cannot be averaged weight by weight. Each hospital trains its own and shares the trained model; the federation's score for a tree type is the window-weighted average of the hospitals' models</td></tr>
+<tr><td>Random Forest, Linear SVM</td><td>Left out: both had ensemble weight 0 in Phase-I, and Random Forest took about 122 ms per window with a 682 MB file</td></tr>
+</table>
+
+<h2><span class="no">6</span>Security Layer and Orchestrator Agent</h2>
+<h3>Security Layer</h3>
+<p>At registration each hospital receives a 32-byte secret key. Before sending, the hospital computes <code>HMAC-SHA256(key, weights + sample count)</code>. The server recomputes it and accepts the update only if the two match, using a constant-time comparison. This detects updates changed in transit and updates from unregistered senders.</p>
+
+<h3>Orchestrator Agent rules</h3>
+<table>
+<tr><th>No.</th><th>Check</th><th>Rejects</th></tr>
+<tr><td>1</td><td>Every value in the update is finite</td><td>Updates containing NaN or infinity (a crashed or faulty client)</td></tr>
+<tr><td>2</td><td>0 &lt; sample count &le; the hospital's registered training windows</td><td>A client inflating its count to gain more weight</td></tr>
+<tr><td>3</td><td>Size of the change from the global model &le; 3 &times; the median size of the other hospitals' changes</td><td>Scaled (boosted) updates that would dominate the average</td></tr>
+<tr><td>4</td><td>Cosine similarity between the change and the other hospitals' mean change &ge; &minus;0.1</td><td>Sign-flipped updates that push the model the wrong way</td></tr>
+</table>
+<p>Rejected updates are left out of that round only, so a hospital that recovers can take part again in the next round.</p>
+<h3>Attack simulation</h3>
+<p>To show that the checks work, any client can be made faulty during an experiment: <b>scale</b> (change &times; 20), <b>signflip</b>, <b>noise</b>, <b>nan</b>, or <b>tamper</b> (changed after signing). The round log then records which stage rejected it and why.</p>
+
+<h2><span class="no">7</span>FedAvg and FedProx</h2>
+<div class="f">FedAvg:    w(t+1) = &Sigma;_k ( n_k / &Sigma;_j n_j ) &middot; w_k(t+1)          over accepted hospitals k
+
+FedProx:   local objective at hospital k
+           L_k(w) + (&mu; / 2) &middot; || w &minus; w(t) ||&sup2;              &mu; = 0.01 by default
+           then the same weighted average on the server</div>
+<p><b>FedAvg</b> averages the hospitals' models in proportion to their training windows. When hospitals are very different (non-IID), their local models can drift apart and the average gets worse. <b>FedProx</b> adds a proximal term that keeps each local model close to the current global model, which usually makes training more stable on non-IID data. Both are run and compared.</p>
+
+<h2><span class="no">8</span>Each hospital runs on its own data</h2>
+<p>After federated training, every hospital personalises the shared models on <b>its own validation patients</b>, exactly as Phase-I did on the pooled validation set:</p>
+<ul><li><b>Isotonic calibration</b> per model, so probabilities match that hospital's own sepsis rate.</li>
+<li><b>Ensemble weights</b> found with SLSQP on that hospital's validation log-loss.</li>
+<li><b>Alert threshold</b> by the same rule: best F1 with recall &ge; 0.50, on that hospital's validation patients.</li></ul>
+<p>So Hospital A and Hospital B share what they learn but each gets an ensemble and threshold that fit its own patients. The unit's artifacts (preprocessor, models, calibrators, weights, threshold, model card) are stored in the hospital's own folder, and that hospital's Sepsis Prediction Agent loads them.</p>
+<p>The audit record written by the orchestrator includes the <b>hospital ID</b>, the <b>federated model version</b> and the list of hospitals the model was trained on, next to the SHA-256 of the input window.</p>
+
+<h2><span class="no">9</span>Three-agent pipeline in each hospital unit</h2>
+<p>Phase-I used ten agents. Several of them were single steps rather than decisions (loading a file, writing a log line), so the pipeline is reduced to <b>three agents, each owning one complete responsibility</b>. Every hospital unit runs the same three agents with its own personalised models.</p>
+<div class="flow3">
+  <div class="ag3"><div class="n">AGENT 1</div><b>Data Gathering and Preprocessing</b>
+  <ul><li>Gathers the latest 16-hour window (16 &times; 39) from the hospital's record</li><li>Fingerprints the input as received (SHA-256)</li><li>Validates shape and history length; sets impossible values to missing</li><li>Reports vitals and labs observed</li><li>Applies the federated imputer and scaler</li><li>Measures slope and 4-hour change of key vitals</li></ul></div>
+  <div class="ag3"><div class="n">AGENT 2</div><b>Sepsis Prediction</b>
+  <ul><li>Scores the window with the GRU, LSTM, Temporal CNN, Logistic Regression, LightGBM and XGBoost models</li><li>Calibrates each score with the hospital's isotonic calibrators</li><li>Combines them with the hospital's ensemble weights</li><li>Decides the alert with the hospital's own threshold</li><li>Reports the hospital's precision, sensitivity, specificity and alerts per 100 windows at that threshold</li></ul></div>
+  <div class="ag3"><div class="n">AGENT 3</div><b>Explainability and Clinical Guidance</b>
+  <ul><li>Occlusion: contribution of every observed signal, in percentage points</li><li>Flags latest values outside adult reference ranges</li><li>Writes fixed decision-support guidance</li><li>Blocks diagnosis, treatment and medication wording</li><li>Builds the clinician report</li></ul></div>
+</div>
+<p>The <b>orchestrator</b> is not an agent. It runs the three agents in order, records each one's status, time and output, stops the run if Agent 1 finds the data unusable, and writes the <b>audit record</b>: trace ID, hospital ID, SHA-256 of the input window, federated model version, hospitals trained on, ensemble weights, threshold, probability, alert and timestamp.</p>
+<h3>Where the ten Phase-I agents went</h3>
+<table>
+<tr><th>Phase-I agent</th><th>Now part of</th></tr>
+<tr><td>Data Loader, Validation, Preprocessing, Temporal Analysis</td><td>Agent 1: Data Gathering and Preprocessing</td></tr>
+<tr><td>Prediction, Alert</td><td>Agent 2: Sepsis Prediction</td></tr>
+<tr><td>Explanation, Clinical Safety, Report</td><td>Agent 3: Explainability and Clinical Guidance</td></tr>
+<tr><td>Audit</td><td>Orchestrator (logging, not a decision)</td></tr>
+</table>
+<div class="box key"><b class="lbl">If asked "why only three agents?"</b>
+An agent should own one complete responsibility and make its own decisions. Getting usable data, judging the sepsis risk, and explaining that risk safely to a clinician are three different responsibilities. The ten Phase-I steps were functions inside those three, so they are now grouped under the agent that owns them.</div>
+
+<h2><span class="no">10</span>Experiments and evaluation</h2>
+<table>
+<tr><th>Scheme</th><th>Description</th><th>Purpose</th></tr>
+<tr><td>Local</td><td>Each hospital trains only on its own data</td><td>What a hospital achieves alone</td></tr>
+<tr><td>FedAvg</td><td>Federated training, plain averaging</td><td>Benefit of collaboration without sharing data</td></tr>
+<tr><td>FedProx</td><td>Federated training with proximal term</td><td>Effect on non-IID hospitals</td></tr>
+<tr><td>Centralised</td><td>All training data pooled (Phase-I setting)</td><td>Upper reference that needs data sharing</td></tr>
+</table>
+<p>Every scheme is evaluated on <b>each hospital's own test patients</b>, and local models are also tested on the other hospital (cross-hospital), which shows how much a single-hospital model loses when used elsewhere.</p>
+<h3>Measures</h3>
+<ul><li>Window level: AUROC, AUPRC, F1, accuracy, sensitivity, specificity, precision, NPV, alerts per 100 windows, Brier score, ECE.</li>
+<li>Patient level: sepsis patients flagged before onset, lead time, and non-sepsis patients with a false alert.</li>
+<li>Federation: validation AUROC, F1 and accuracy of the global model after every round, for every hospital; accepted and rejected updates per round; bytes exchanged per round.</li></ul>
+<h3>Result charts (same comparisons as the reference)</h3>
+<ul><li>Global validation F1 against communication rounds, FedAvg vs FedProx.</li>
+<li>FedAvg vs FedProx: accuracy, F1 and AUROC.</li>
+<li>Per-client F1 and AUROC: local vs FedAvg vs FedProx vs centralised.</li>
+<li>Records (patients and windows) per hospital client.</li>
+<li>Round log of the Orchestrator Agent, including the attack simulation.</li></ul>
+<div class="box note"><b class="lbl">Results</b>
+No federated results are reported here yet. They will come only from running the module on the real PhysioNet files; the synthetic files in the test folder exist only to check that the code runs.</div>
+
+<h2><span class="no">11</span>Portal screens</h2>
+<div class="two">
+  <div class="wire"><h4>Hospital Unit console (one per hospital)</h4>
+  <ul style="margin:0"><li>Hospital selector: Hospital A, Hospital B, &hellip;</li>
+  <li>Local data: patients, windows, sepsis rate, missingness</li>
+  <li>Privacy panel: what this unit shared and what stayed local</li>
+  <li>Local training status per round, update accepted or rejected</li>
+  <li>This hospital's personalised weights and threshold</li>
+  <li>Results on its own test patients: local vs FedAvg vs FedProx vs centralised</li>
+  <li>Patient-level early warning for this hospital</li></ul></div>
+  <div class="wire"><h4>Central Server (administrator)</h4>
+  <ul style="margin:0"><li>Pipeline view: Security Layer &rarr; Orchestrator Agent &rarr; Aggregation &rarr; Global Model</li>
+  <li>Round log: accepted and rejected updates with reasons</li>
+  <li>F1 and AUROC against rounds, FedAvg vs FedProx</li>
+  <li>Per-client comparison and records per client</li>
+  <li>Cross-hospital matrix</li>
+  <li>Global model version, digest and bytes exchanged</li></ul></div>
+</div>
+<p>The existing AI Pipeline screen gains a hospital selector, so the three agents run with the selected hospital's personalised models, and the pipeline view shows three stages instead of ten.</p>
+
+<h2><span class="no">12</span>Differences from the reference</h2>
+<table>
+<tr><th>Reference</th><th>This project</th><th>Reason</th></tr>
+<tr><td>UCI heart disease, 5 simulated clients</td><td>PhysioNet sepsis, 2 real hospital systems (more by ICU type)</td><td>Real hospital boundaries</td></tr>
+<tr><td>One MLP</td><td>Four neural models plus shared tree models, then a calibrated ensemble</td><td>Keeps the Phase-I ensemble</td></tr>
+<tr><td>Diagnosis Agent using an LLM</td><td>Explainability and Clinical Guidance Agent (rule-based wording)</td><td>The project never states a diagnosis; fixed safe wording only</td></tr>
+<tr><td>SHAP (proposed)</td><td>Occlusion now, SHAP comparison planned</td><td>Works on the whole ensemble</td></tr>
+<tr><td>One global model</td><td>Global model plus per-hospital calibration, weights and threshold</td><td>Each hospital runs on its own data</td></tr>
+</table>
+
+<h2><span class="no">13</span>Implementation status</h2>
+<table>
+<tr><th>Part</th><th>Status</th></tr>
+<tr><td>Hospital unit: loading, cleaning, patient split, 16-hour windows</td><td class="tick">Built and tested</td></tr>
+<tr><td>Federated preprocessing (histogram median, exact mean and SD)</td><td class="tick">Built and tested against pooled values</td></tr>
+<tr><td>Security Layer (HMAC-SHA256)</td><td class="tick">Built and tested (tampering, wrong count, unknown client)</td></tr>
+<tr><td>Orchestrator Agent (4 rules)</td><td class="tick">Built and tested (scaled, flipped, NaN, inflated count)</td></tr>
+<tr><td>FedAvg, FedProx, local and centralised schemes</td><td class="tick">Built, end-to-end run on synthetic data</td></tr>
+<tr><td>Per-hospital personalisation, artifacts and hospital predictor with audit fields</td><td class="tick">Built and tested</td></tr>
+<tr><td>Run on the real PhysioNet files</td><td class="todo">To do (on the team laptop, where the data is)</td></tr>
+<tr><td>Hospital Unit and Central Server portal pages</td><td class="todo">To do after this report is approved</td></tr>
+<tr><td>Three-agent pipeline with orchestrator and audit record</td><td class="tick">Built and tested (completion, early stop, cleaning, flags, wording, audit hash)</td></tr>
+<tr><td>Replacing the ten agents in the deployed portal and Python service</td><td class="todo">Needs the portal and service source code</td></tr>
+</table>
+
+<h3>How to run</h3>
+<div class="f">pip install -r requirements.txt
+python run_federated.py \
+  --hospital A "Hospital A (PhysioNet set A)" data/training_setA \
+  --hospital B "Hospital B (PhysioNet set B)" data/training_setB \
+  --rounds 5 --artifacts artifacts --out results/federated_results.json
+
+# more non-IID clients:          add --split-by-icu
+# show the orchestrator working: add --attack B scale
+
+# one assessment through the three agents inside Hospital A:
+python assess.py --unit artifacts/fedprox/hospital_A --patient data/training_setA/p000009.psv</div>
+</body></html>
